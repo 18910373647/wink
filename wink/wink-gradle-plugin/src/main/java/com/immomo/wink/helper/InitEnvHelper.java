@@ -28,7 +28,6 @@ import com.immomo.wink.util.LocalCacheUtil;
 import com.immomo.wink.util.Utils;
 import com.immomo.wink.util.WinkLog;
 
-import org.apache.http.util.TextUtils;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.lib.RepositoryBuilder;
 import org.gradle.api.Project;
@@ -125,7 +124,7 @@ public class InitEnvHelper {
 
     public boolean isBranchOK() {
         WinkLog.i("[IniEnvHelper] [isBranchOK]...");
-        if (TextUtils.isEmpty(Settings.env.rootDir)) {
+        if (Utils.isEmpty(Settings.env.rootDir)) {
             return false;
         }
         try {

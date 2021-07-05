@@ -16,8 +16,6 @@
 
 package com.immomo.wink.util;
 
-import com.immomo.wink.Settings;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -249,6 +247,10 @@ public class Utils {
                 file.delete();
             }
         }
+    }
+
+    public static boolean isEmpty(String str) {
+        return str == null || str.isEmpty();
     }
 }
 
