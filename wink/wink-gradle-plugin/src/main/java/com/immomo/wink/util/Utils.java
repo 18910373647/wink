@@ -203,6 +203,10 @@ public class Utils {
     }
 
     public static String upperCaseFirst(String val) {
+        if (val == null || val.isEmpty()) {
+            return "";
+        }
+
         char[] arr = val.toCharArray();
         arr[0] = Character.toUpperCase(arr[0]);
         return new String(arr);
