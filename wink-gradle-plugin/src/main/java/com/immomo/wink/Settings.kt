@@ -17,6 +17,7 @@ package com.immomo.wink
 
 import com.immomo.wink.compiler.ProcessorMapping
 import com.immomo.wink.util.LocalCacheUtil
+import com.immomo.wink.util.WinkLog
 import java.io.File
 import java.io.Serializable
 import java.util.*

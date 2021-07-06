@@ -28,6 +28,7 @@ import com.immomo.wink.util.LocalCacheUtil;
 import com.immomo.wink.util.Utils;
 import com.immomo.wink.util.WinkLog;
 
+import org.apache.http.util.TextUtils;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.lib.RepositoryBuilder;
 import org.gradle.api.Project;
@@ -218,6 +219,28 @@ public class InitEnvHelper {
         findModuleTree2(project, "");
 
         Settings.storeEnv(env, project.getRootDir() + "/.idea/" + Settings.NAME + "/env");
+    }
+
+    public static String obtainAppDebugPackageName(Project project) {
+        AppExtension androidExt = (AppExtension) project.getExtensions().getByName("android");
+        Iterator<ApplicationVariant> itApp = androidExt.getApplicationVariants().iterator();
+        String variantName = "debug";
+        String debugPackageName = "";
+        WinkLog.d("[obtainAppDebugPackageName] start...");
+        if (androidExt.getProductFlavors() != null && androidExt.getProductFlavors().getNames().size() > 0) {
+            String defaultFlavor = androidExt.getProductFlavors().getNames().first();
+            variantName = defaultFlavor + "Debug";
+            WinkLog.d("[obtainAppDebugPackageName] variantName=" + variantName);
+        }
+        while (itApp.hasNext()) {
+            ApplicationVariant variant = itApp.next();
+            if (variant.getName().equals(variantName)) {
+                debugPackageName = variant.getApplicationId();
+                WinkLog.d("[obtainAppDebugPackageName] debugPackageName=" + debugPackageName);
+                break;
+            }
+        }
+        return debugPackageName;
     }
 
 //    private void initKaptTaskParams(Settings.Env env) {

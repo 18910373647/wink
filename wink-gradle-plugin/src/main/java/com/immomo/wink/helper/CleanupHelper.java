@@ -26,6 +26,8 @@ import org.gradle.api.Project;
 
 import java.io.File;
 
+import static com.immomo.wink.helper.InitEnvHelper.obtainAppDebugPackageName;
+
 public class CleanupHelper {
 
     String mRootPath;
@@ -64,7 +66,13 @@ public class CleanupHelper {
 
 
     public void deletePatchFileOnPhone() {
-        String destPath = "/sdcard/Android/data/" + Settings.env.debugPackageName + "/patch_file/";
+        String debugPackageName = Settings.env.debugPackageName;
+        if (TextUtils.isEmpty(Settings.env.debugPackageName) && mProject != null) {
+            debugPackageName = obtainAppDebugPackageName(mProject);
+            WinkLog.d("deletePatchFileOnPhone env is empty.");
+        }
+        WinkLog.d("deletePatchFileOnPhone debugPackageName=" + debugPackageName);
+        String destPath = "/sdcard/Android/data/" + debugPackageName + "/patch_file/";
         String destPath2 = "/sdcard/" + Constant.TAG + "/patch_file/";
 
         String cmds = "";
