@@ -23,10 +23,10 @@ class ResourceHelper {
     private fun compileResources() {
         val stableId = File(Settings.env.tmpPath + "/stableIds.txt")
         if (stableId.exists()) {
-            WinkLog.d("stableIds存在")
+            WinkLog.d("stableIds file exist!")
         } else {
             WinkLog.d("=================================")
-            throw FileNotFoundException("stableIds不存在，请先完整编译一遍项目！")
+            throw FileNotFoundException("stableIds not exist! Please compile project completely first.")
         }
 
         Settings.data.needProcessDebugResources = true
@@ -46,14 +46,14 @@ class ResourceHelper {
     private fun compileResourcesWithout() {
         val stableId = File(Settings.env.tmpPath + "/stableIds.txt")
         if (stableId.exists()) {
-            WinkLog.d("stableIds存在")
+            WinkLog.d("stableIds file exist!")
         } else {
             WinkLog.d("=================================")
-            throw FileNotFoundException("stableIds不存在，请先完整编译一遍项目！")
+            throw FileNotFoundException("stableIds not exist! Please compile project completely first.")
         }
 
         Settings.data.needProcessDebugResources = true
-        var ret = Utils.runShells("cd ${Settings.env.appProjectDir}/../", "./gradlew process${Utils.upperCaseFirst(Settings.env.defaultFlavor)}DebugResources --offline")
+        val ret = Utils.runShells("cd ${Settings.env.appProjectDir}/../", "./gradlew process${Utils.upperCaseFirst(Settings.env.defaultFlavor)}DebugResources --offline")
         if (ret.errorResult.size > 0) {
 //            WinkLog.throwAssert("Compile resources error.");
         }

@@ -3,8 +3,11 @@ package com.immomo.wink;
 import androidx.appcompat.app.AppCompatActivity;
 import butterknife.BindView;
 
+import android.content.res.AssetFileDescriptor;
+import android.content.res.Resources;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -27,11 +30,19 @@ public class MainActivity extends AppCompatActivity {
         button.setBackgroundColor(Color.BLACK);
 
         TextView textView = findViewById(R.id.textView);
-        textView.setText(new Test111().getAAA() + "ffff" + new ZZ().getKK());
+        textView.setText(new Test111().getAAA() + "xxxxx" + new ZZ().getKK());
 //        textView.setText(Tools.getTitle() + "xx1");
 
         textView.setOnClickListener((v)->{
             Toast.makeText(this, "2" + new ZZ().getKK(), Toast.LENGTH_SHORT).show();
         });
+        loadMusic(R.raw.audio_match);
+    }
+
+    private void loadMusic(int rawID){
+        Log.i("rawID", "rawId=" + rawID);
+        Resources resources = this.getResources();
+
+        AssetFileDescriptor afd = resources.openRawResourceFd(rawID);
     }
 }

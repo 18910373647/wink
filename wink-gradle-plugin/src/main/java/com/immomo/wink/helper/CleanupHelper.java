@@ -21,9 +21,21 @@ import com.immomo.wink.Settings;
 import com.immomo.wink.util.Utils;
 import com.immomo.wink.util.WinkLog;
 
+import org.apache.http.util.TextUtils;
+import org.gradle.api.Project;
+
 import java.io.File;
 
 public class CleanupHelper {
+
+    String mRootPath;
+    Project mProject;
+
+    public CleanupHelper(Project project) {
+        mProject = project;
+        mRootPath = mProject.getRootProject().getProjectDir().getAbsolutePath() + "/.idea/" + Settings.NAME;
+    }
+
     public void cleanup() {
         deleteAllApk();
         deleteAllDex();
@@ -65,8 +77,9 @@ public class CleanupHelper {
     }
 
     public void deleteAllApk() {
-        WinkLog.d("删除文件deleteAllApk :" + Settings.env.tmpPath);
-        File f = new File(Settings.env.tmpPath);
+        WinkLog.d("deleteAllApk :" + mRootPath);
+        String path = mRootPath;
+        File f = new File(path);
         if (f.exists() && f.isDirectory()) {
             File[] apks = f.listFiles(pathname -> pathname.getName().endsWith("apk"));
             if (apks != null) {
@@ -78,8 +91,9 @@ public class CleanupHelper {
     }
 
     public void deleteAllDex() {
-        WinkLog.d("删除文件deleteAllDex :" + Settings.env.tmpPath);
-        File f = new File(Settings.env.tmpPath);
+        WinkLog.d("deleteAllDex :" + mRootPath);
+        String path = mRootPath;
+        File f = new File(path);
         if (f.exists() && f.isDirectory()) {
             File[] files = f.listFiles(pathname -> (pathname.getName().endsWith("dex") || pathname.getName().endsWith("jar")));
             if (files != null) {
@@ -91,13 +105,12 @@ public class CleanupHelper {
     }
 
     public void delete(String path) {
-        WinkLog.d("删除文件:" + Settings.env.tmpPath + "/" + path);
-        File f = new File(Settings.env.tmpPath + "/" + path);
+        WinkLog.d("delete file :" + mRootPath + "/" + path);
+        File f = new File(mRootPath + "/" + path);
         deleteFile(f);
     }
 
     public boolean deleteFile(File dirFile) {
-        // 如果dir对应的文件不存在，则退出
         if (!dirFile.exists()) {
             return false;
         }

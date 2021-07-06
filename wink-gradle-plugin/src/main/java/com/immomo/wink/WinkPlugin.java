@@ -129,7 +129,7 @@ public class WinkPlugin implements Plugin<Project> {
                 @Override
                 public void execute(Task task) {
                     WinkLog.TimerLog timer = WinkLog.timerStart("winkCleanup", "cleanUp");
-                    new com.immomo.wink.helper.CleanupHelper().cleanup();
+                    new com.immomo.wink.helper.CleanupHelper(project).cleanup();
                     timer.end("cleanUp");
                 }
             });
@@ -138,7 +138,7 @@ public class WinkPlugin implements Plugin<Project> {
 
     private void afterFullBuild(Project project) {
         // 清理
-        new CleanupHelper().cleanOnAssemble();
+        new CleanupHelper(project).cleanOnAssemble();
         // 初始化
         new InitEnvHelper().initEnv(project, true);
         // 产生快照

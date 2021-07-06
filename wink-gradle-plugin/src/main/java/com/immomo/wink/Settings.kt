@@ -93,7 +93,7 @@ object Settings {
             @JvmField var patchPath: String = "",
             @JvmField var processorMapping: ProcessorMapping? = null,
             @JvmField var beginTime: Long? = null,
-            @JvmField var logLevel: Int = 4
+            @JvmField var logLevel: Int = 0
     ) : Serializable
 
     data class ProjectFixedInfo(
