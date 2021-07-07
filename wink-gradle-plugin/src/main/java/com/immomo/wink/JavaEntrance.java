@@ -5,7 +5,6 @@ import com.immomo.wink.helper.CompileHelper;
 import com.immomo.wink.helper.DiffHelper;
 import com.immomo.wink.helper.IncrementPatchHelper;
 import com.immomo.wink.helper.InitEnvHelper;
-import com.immomo.wink.util.Utils;
 import com.immomo.wink.util.WinkLog;
 
 public class JavaEntrance {
@@ -27,13 +26,13 @@ public class JavaEntrance {
         WinkLog.i("Wink start...");
         if (helper.isEnvExist(path)) {
             // Increment
-            helper.initEnvByPath(path);
+            helper.initEnvFromCache(path);
             if (!helper.isBranchOK()) {
-                helper.fullBuild(path);
+                helper.fullBuildByInstallDebug(path);
                 return;
             }
         } else {
-            helper.fullBuild(path);
+            helper.fullBuildByInstallDebug(path);
             return;
         }
 

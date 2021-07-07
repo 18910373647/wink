@@ -28,7 +28,6 @@ import com.immomo.wink.util.LocalCacheUtil;
 import com.immomo.wink.util.Utils;
 import com.immomo.wink.util.WinkLog;
 
-import org.apache.http.util.TextUtils;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.lib.RepositoryBuilder;
 import org.gradle.api.Project;
@@ -48,27 +47,6 @@ import java.util.function.Consumer;
 
 public class InitEnvHelper {
     Project project;
-    // from retrolambda
-    public String getJavaHome() {
-        String javaHomeProp = System.getProperty("java.home");
-        if (javaHomeProp != null && !javaHomeProp.equals("")) {
-            int jreIndex = javaHomeProp.lastIndexOf("${File.separator}jre");
-            if (jreIndex != -1) {
-                return javaHomeProp.substring(0, jreIndex);
-            } else {
-                List<String> rets = new ArrayList<>();
-                rets.toArray();
-                Set<Integer> has = new HashSet<>();
-
-                String str = "";
-                new String(str.toCharArray());
-
-                return javaHomeProp;
-            }
-        } else {
-            return System.getenv("JAVA_HOME");
-        }
-    }
 
     public void initEnv(Project project, boolean reload) {
         if (reload) {
@@ -79,9 +57,78 @@ public class InitEnvHelper {
                     + "/.idea/" + Settings.NAME + "/env");
         }
 
-        // Data每次初始化
         initData(project);
-//        Log.v(Constant.TAG, Settings.env.toString());
+    }
+
+    public void initEnvFromCache(String rootPath) {
+        Settings.restoreEnv(rootPath
+                + "/.idea/" + Settings.NAME + "/env");
+
+        // Data每次初始化
+        Settings.initData();
+    }
+
+    public void createEnv(Project project) {
+        this.project = project;
+
+        AppExtension androidExt = (AppExtension) project.getExtensions().getByName("android");
+
+        Settings.Env env = Settings.env;
+        env.javaHome = getJavaHome();
+        env.sdkDir = androidExt.getSdkDirectory().getPath();
+        env.buildToolsVersion = androidExt.getBuildToolsVersion();
+        env.buildToolsDir = FileUtils.join(androidExt.getSdkDirectory().getPath(),
+                "build-tools", env.buildToolsVersion);
+        env.compileSdkVersion = androidExt.getCompileSdkVersion();
+        env.compileSdkDir = FileUtils.join(env.sdkDir, "platforms", env.compileSdkVersion);
+
+        env.rootDir = project.getRootDir().getAbsolutePath();
+        if (androidExt.getProductFlavors() != null && androidExt.getProductFlavors().getNames().size() > 0) {
+            env.defaultFlavor = androidExt.getProductFlavors().getNames().first();
+            env.variantName = env.defaultFlavor + "Debug";
+        }
+
+        if (!Settings.data.newVersion.isEmpty()) {
+            env.version = Settings.data.newVersion;
+            Settings.data.newVersion = "";
+        }
+
+        try {
+            Repository rep = new RepositoryBuilder()
+                    .findGitDir(new File(env.rootDir))
+                    .build();
+            env.branch = rep.getBranch();
+            WinkLog.d("[IniEnvHelper] current branch:" + env.branch);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+
+        env.appProjectDir = project.getProjectDir().getAbsolutePath();
+        env.tmpPath = project.getRootProject().getProjectDir().getAbsolutePath() + "/.idea/" + Settings.NAME;
+
+        env.packageName = androidExt.getDefaultConfig().getApplicationId();
+        Iterator<ApplicationVariant> itApp = androidExt.getApplicationVariants().iterator();
+        while (itApp.hasNext()) {
+            ApplicationVariant variant = itApp.next();
+            if (variant.getName().equals(env.variantName)) {
+                env.debugPackageName = variant.getApplicationId();
+                break;
+            }
+        }
+
+        String manifestPath = androidExt.getSourceSets().getByName("main").getManifest().getSrcFile().getPath();
+        env.launcherActivity = AndroidManifestUtils.findLauncherActivity(manifestPath, env.packageName);
+
+        WinkOptions options = project.getExtensions().getByType(WinkOptions.class);
+        env.options = options.copy();
+
+        // todo apt
+//        initKaptTaskParams(env);
+
+        findModuleTree2(project, "");
+
+        Settings.storeEnv(env, project.getRootDir() + "/.idea/" + Settings.NAME + "/env");
     }
 
     private void initData(Project project) {
@@ -145,80 +192,31 @@ public class InitEnvHelper {
         return true;
     }
 
-    public void initEnvByPath(String path) {
-        Settings.restoreEnv(path
-                + "/.idea/" + Settings.NAME + "/env");
-
-        // Data每次初始化
-        Settings.initData();
-    }
-
-    public void fullBuild(String path) {
+    public void fullBuildByInstallDebug(String path) {
         WinkLog.i("Cache or Branch invalid, start full build...");
         Utils.runShells("cd " + path + " && " + "./gradlew installDebug");
     }
 
-    protected void createEnv(Project project) {
-        this.project = project;
+    // from retrolambda
+    public String getJavaHome() {
+        String javaHomeProp = System.getProperty("java.home");
+        if (javaHomeProp != null && !javaHomeProp.equals("")) {
+            int jreIndex = javaHomeProp.lastIndexOf("${File.separator}jre");
+            if (jreIndex != -1) {
+                return javaHomeProp.substring(0, jreIndex);
+            } else {
+                List<String> rets = new ArrayList<>();
+                rets.toArray();
+                Set<Integer> has = new HashSet<>();
 
-        AppExtension androidExt = (AppExtension) project.getExtensions().getByName("android");
+                String str = "";
+                new String(str.toCharArray());
 
-        Settings.Env env = Settings.env;
-        env.javaHome = getJavaHome();
-        env.sdkDir = androidExt.getSdkDirectory().getPath();
-        env.buildToolsVersion = androidExt.getBuildToolsVersion();
-        env.buildToolsDir = FileUtils.join(androidExt.getSdkDirectory().getPath(),
-                "build-tools", env.buildToolsVersion);
-        env.compileSdkVersion = androidExt.getCompileSdkVersion();
-        env.compileSdkDir = FileUtils.join(env.sdkDir, "platforms", env.compileSdkVersion);
-
-        env.rootDir = project.getRootDir().getAbsolutePath();
-        if (androidExt.getProductFlavors() != null && androidExt.getProductFlavors().getNames().size() > 0) {
-            env.defaultFlavor = androidExt.getProductFlavors().getNames().first();
-            env.variantName = env.defaultFlavor + "Debug";
-        }
-
-        if (!Settings.data.newVersion.isEmpty()) {
-            env.version = Settings.data.newVersion;
-            Settings.data.newVersion = "";
-        }
-
-        try {
-            Repository rep = new RepositoryBuilder()
-                    .findGitDir(new File(env.rootDir))
-                    .build();
-            env.branch = rep.getBranch();
-            WinkLog.d("[IniEnvHelper] current branch:" + env.branch);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-
-        env.appProjectDir = project.getProjectDir().getAbsolutePath();
-        env.tmpPath = project.getRootProject().getProjectDir().getAbsolutePath() + "/.idea/" + Settings.NAME;
-
-        env.packageName = androidExt.getDefaultConfig().getApplicationId();
-        Iterator<ApplicationVariant> itApp = androidExt.getApplicationVariants().iterator();
-        while (itApp.hasNext()) {
-            ApplicationVariant variant = itApp.next();
-            if (variant.getName().equals(env.variantName)) {
-                env.debugPackageName = variant.getApplicationId();
-                break;
+                return javaHomeProp;
             }
+        } else {
+            return System.getenv("JAVA_HOME");
         }
-
-        String manifestPath = androidExt.getSourceSets().getByName("main").getManifest().getSrcFile().getPath();
-        env.launcherActivity = AndroidManifestUtils.findLauncherActivity(manifestPath, env.packageName);
-
-        WinkOptions options = project.getExtensions().getByType(WinkOptions.class);
-        env.options = options.copy();
-
-        // todo apt
-//        initKaptTaskParams(env);
-
-        findModuleTree2(project, "");
-
-        Settings.storeEnv(env, project.getRootDir() + "/.idea/" + Settings.NAME + "/env");
     }
 
     public static String obtainAppDebugPackageName(Project project) {

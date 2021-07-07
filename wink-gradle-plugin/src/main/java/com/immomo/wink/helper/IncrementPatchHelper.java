@@ -20,6 +20,8 @@ import com.immomo.wink.Settings;
 import com.immomo.wink.util.Utils;
 import com.immomo.wink.util.WinkLog;
 
+import static com.immomo.wink.Constant.RESOURCE_APK_SUFFIX;
+
 public class IncrementPatchHelper {
     public boolean patchToApp() {
         if (Settings.data.classChangedCount <= 0 && !Settings.data.hasResourceChanged) {
@@ -34,7 +36,7 @@ public class IncrementPatchHelper {
         patchResources();
         restartApp();
 
-        WinkLog.i("Patch finish in " + (System.currentTimeMillis() -  Settings.data.beginTime) / 1000 + "s.");
+        WinkLog.i("Patch finish in " + (System.currentTimeMillis() - Settings.data.beginTime) / 1000 + "s.");
         WinkLog.i(Settings.data.classChangedCount + " file changed, "
                 + (Settings.data.hasResourceChanged ? "has" : "no") + " resource changed.");
         return true;
@@ -45,7 +47,7 @@ public class IncrementPatchHelper {
         Utils.ShellResult result = Utils.runShells("source ~/.bash_profile\nadb shell ls " + patch);
         boolean noPermission = false;
         Utils.runShells(false, "adb shell mkdir " + patch);
-        for (String error: result.getErrorResult()) {
+        for (String error : result.getErrorResult()) {
             if (error.contains("Permission denied")) {
                 // 标志没文件权限
                 noPermission = true;
@@ -87,12 +89,12 @@ public class IncrementPatchHelper {
 
         WinkLog.i("Resources patching...");
 
-        String patchName = Settings.env.version + "_resources-debug.apk";
+        String patchName = Settings.env.version + ResourceHelper.apk_suffix;
         Utils.runShells("source ~/.bash_profile\n" +
                 "adb shell rm -rf " + Settings.data.patchPath + "apk\n" +
                 "adb shell mkdir " + Settings.data.patchPath + "apk\n" +
                 "adb push " + Settings.env.tmpPath + "/" + patchName + " " + Settings.data.patchPath + "apk/" +
-                Settings.env.version + "_resources-debug.png");
+                Settings.env.version + RESOURCE_APK_SUFFIX);
     }
 
     public void restartApp() {

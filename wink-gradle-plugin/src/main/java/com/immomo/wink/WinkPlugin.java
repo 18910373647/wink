@@ -31,6 +31,8 @@ import org.gradle.api.Task;
 
 import java.io.File;
 
+import static com.immomo.wink.helper.InitEnvHelper.obtainAppDebugPackageName;
+
 public class WinkPlugin implements Plugin<Project> {
 
     @Override
@@ -62,6 +64,7 @@ public class WinkPlugin implements Plugin<Project> {
         project.afterEvaluate(it -> {
             WinkLog.TimerLog timerAfterEvaluate = WinkLog.timerStart("timerAfterEvaluate");
             createWinkTask(it);
+            createWinkInitEnvTask(it);
             createWinkInitTask(it);
             createWinkInitWithShellTask(it);
             createCleanupTask(it);
@@ -100,26 +103,27 @@ public class WinkPlugin implements Plugin<Project> {
 
     public void createWinkTask(Project project) {
         project.getTasks().register("wink", task -> {
-            task.doLast(new Action<Task>() {
-                @Override
-                public void execute(Task task) {
-                    JavaEntrance.main(new String[] {"."});
-                }
-            });
+            task.doLast(task1 -> JavaEntrance.main(new String[]{"."}));
         }).get().setGroup(Settings.NAME);
+    }
+
+    public void createWinkInitEnvTask(Project project) {
+        project.getTasks().register("winkInitEnv", task ->
+                task.doLast(task1 -> new InitEnvHelper().createEnv(project))
+        ).get().setGroup(Settings.NAME);
     }
 
     public void createWinkInitTask(Project project) {
         String path = project.getRootDir().getPath();
         String version = this.getClass().getPackage().getImplementationVersion();
-        String[] downloads =  new String[]{String.format(Constant.DOWNLOADURL,version)};
+        String[] downloads = new String[]{String.format(Constant.DOWNLOADURL, version)};
         project.getTasks().register("winkInit", WinkInitTask.class, downloads, path, false).get().setGroup(Settings.NAME);
     }
 
     public void createWinkInitWithShellTask(Project project) {
         String path = project.getRootDir().getPath();
         String version = this.getClass().getPackage().getImplementationVersion();
-        String[] downloads =  new String[]{String.format(Constant.DOWNLOADURL,version)};
+        String[] downloads = new String[]{String.format(Constant.DOWNLOADURL, version)};
         project.getTasks().register("winkInitWithShell", WinkInitTask.class, downloads, path, true).get().setGroup(Settings.NAME);
     }
 
@@ -129,7 +133,11 @@ public class WinkPlugin implements Plugin<Project> {
                 @Override
                 public void execute(Task task) {
                     WinkLog.TimerLog timer = WinkLog.timerStart("winkCleanup", "cleanUp");
-                    new com.immomo.wink.helper.CleanupHelper(project).cleanup();
+                    String rootPath = project.getRootProject().getProjectDir().getAbsolutePath() + "/.idea/" + Settings.NAME;
+                    String pkgName = obtainAppDebugPackageName(project);
+                    // 清理
+                    new CleanupHelper(pkgName, rootPath).cleanOnAssemble();
+                    new com.immomo.wink.helper.CleanupHelper(pkgName, rootPath).cleanup();
                     timer.end("cleanUp");
                 }
             });
@@ -137,8 +145,10 @@ public class WinkPlugin implements Plugin<Project> {
     }
 
     private void afterFullBuild(Project project) {
+        String rootPath = project.getRootProject().getProjectDir().getAbsolutePath() + "/.idea/" + Settings.NAME;
+        String pkgName = obtainAppDebugPackageName(project);
         // 清理
-        new CleanupHelper(project).cleanOnAssemble();
+        new CleanupHelper(pkgName, rootPath).cleanOnAssemble();
         // 初始化
         new InitEnvHelper().initEnv(project, true);
         // 产生快照
@@ -157,9 +167,9 @@ public class WinkPlugin implements Plugin<Project> {
         }
     }
 
-    private String[] getCurrentJarUrl(){
+    private String[] getCurrentJarUrl() {
         String version = this.getClass().getPackage().getImplementationVersion();
-        String url =String.format(Constant.DOWNLOADURL,version);
+        String url = String.format(Constant.DOWNLOADURL, version);
         return new String[]{url};
     }
 

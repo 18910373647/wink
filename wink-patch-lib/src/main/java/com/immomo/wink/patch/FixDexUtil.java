@@ -4,10 +4,12 @@ import android.content.Context;
 import android.os.Environment;
 import android.util.Log;
 import android.widget.Toast;
+
 import java.io.File;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.util.HashSet;
+
 import dalvik.system.DexClassLoader;
 import dalvik.system.PathClassLoader;
 
@@ -19,6 +21,7 @@ public class FixDexUtil {
     private static final String ZIP_SUFFIX = ".zip";
     public static final String DEX_DIR = "odex";
     private static final String OPTIMIZE_DEX_DIR = "opt_dex";
+    private static final String RESOURCE_APK_SUFFIX = "_resources-debug.png";
     private static HashSet<File> loadedDex = new HashSet<>();
 
     static {
@@ -47,9 +50,9 @@ public class FixDexUtil {
     }
 
     /**
-     *@author Minuit
-     *@time 2018/6/25 0025 15:51
-     *@desc 验证是否需要热修复
+     * @author Minuit
+     * @time 2018/6/25 0025 15:51
+     * @desc 验证是否需要热修复
      */
     public static boolean isGoingToFix(Context context) {
         boolean canFix = false;
@@ -172,6 +175,7 @@ public class FixDexUtil {
     }
 
     static String sPatchVersion = null;
+
     public static String getPatchVersion(Context context) {
         if (sPatchVersion != null && !sPatchVersion.isEmpty()) {
             return sPatchVersion;
@@ -204,13 +208,13 @@ public class FixDexUtil {
         String patchVersion = FixDexUtil.getPatchVersion(context);
         File patchFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath()
                 + "/Android/data/" + context.getApplicationContext().getPackageName() + "/patch_file/apk/"
-                + patchVersion + "_resources-debug.png");
+                + patchVersion + RESOURCE_APK_SUFFIX);
         if (patchFile.exists()) {
             return patchFile;
         }
 
         patchFile = new File("/sdcard/wink/patch_file/apk/"
-                + patchVersion + "_resources-debug.png");
+                + patchVersion + RESOURCE_APK_SUFFIX);
         if (patchFile.exists()) {
             return patchFile;
         }

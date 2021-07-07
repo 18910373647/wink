@@ -31,11 +31,11 @@ import static com.immomo.wink.helper.InitEnvHelper.obtainAppDebugPackageName;
 public class CleanupHelper {
 
     String mRootPath;
-    Project mProject;
+    String mPackageName;
 
-    public CleanupHelper(Project project) {
-        mProject = project;
-        mRootPath = mProject.getRootProject().getProjectDir().getAbsolutePath() + "/.idea/" + Settings.NAME;
+    public CleanupHelper(String packageName, String rootPath) {
+        mPackageName = packageName;
+        mRootPath = rootPath;
     }
 
     public void cleanup() {
@@ -67,8 +67,8 @@ public class CleanupHelper {
 
     public void deletePatchFileOnPhone() {
         String debugPackageName = Settings.env.debugPackageName;
-        if (TextUtils.isEmpty(Settings.env.debugPackageName) && mProject != null) {
-            debugPackageName = obtainAppDebugPackageName(mProject);
+        if (TextUtils.isEmpty(Settings.env.debugPackageName) && !TextUtils.isEmpty(mPackageName)) {
+            debugPackageName = mPackageName;
             WinkLog.d("deletePatchFileOnPhone env is empty.");
         }
         WinkLog.d("deletePatchFileOnPhone debugPackageName=" + debugPackageName);

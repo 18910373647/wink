@@ -12,4 +12,6 @@ object Constant {
 
     const val DOWNLOADURL = "https://download.immomo.com/android/wink_lib_%s.zip"
 
+    const val RESOURCE_APK_SUFFIX = "_resources-debug.png"
+
 }
