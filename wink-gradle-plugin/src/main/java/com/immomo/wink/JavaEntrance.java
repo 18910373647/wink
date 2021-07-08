@@ -28,11 +28,11 @@ public class JavaEntrance {
             // Increment
             helper.initEnvFromCache(path);
             if (!helper.isBranchOK()) {
-                helper.fullBuildByInstallDebug(path);
+                new IncrementPatchHelper().fullBuildByInstallDebug(path);
                 return;
             }
         } else {
-            helper.fullBuildByInstallDebug(path);
+            new IncrementPatchHelper().fullBuildByInstallDebug(path);
             return;
         }
 

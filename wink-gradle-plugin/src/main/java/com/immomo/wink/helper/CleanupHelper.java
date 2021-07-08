@@ -81,7 +81,7 @@ public class CleanupHelper {
         cmds += '\n' + "adb shell mkdir " + destPath;
 
         cmds += '\n' + "adb shell rm -rf " + destPath2;
-        Utils.runShell(cmds);
+        Utils.runShells(cmds);
     }
 
     public void deleteAllApk() {

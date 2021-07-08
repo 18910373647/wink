@@ -30,13 +30,13 @@ public class MainActivity extends AppCompatActivity {
         button.setBackgroundColor(Color.BLACK);
 
         TextView textView = findViewById(R.id.textView);
-        textView.setText(new Test111().getAAA() + "xxxxx" + new ZZ().getKK());
+        textView.setText(new Test111().getAAA() + "2" + new ZZ().getKK());
 //        textView.setText(Tools.getTitle() + "xx1");
 
         textView.setOnClickListener((v)->{
-            Toast.makeText(this, "2" + new ZZ().getKK(), Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "221" + new ZZ().getKK(), Toast.LENGTH_SHORT).show();
         });
-        loadMusic(R.raw.audio_match);
+//        loadMusic(R.raw.audio_match);
     }
 
     private void loadMusic(int rawID){

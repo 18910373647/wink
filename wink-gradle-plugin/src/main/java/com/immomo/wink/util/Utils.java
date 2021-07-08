@@ -24,65 +24,14 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.LineNumberReader;
 import java.io.OutputStream;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 public class Utils {
-    public static List<String> runShell(String shStr) {
-        return runShell(shStr, true);
-    }
-
-    public static List<String> runShell(String shStr, boolean outputError) {
-        WinkLog.d("准备运行shell : " + shStr);
-        List<String> strList = new ArrayList<String>();
-        try {
-            Process process = Runtime.getRuntime().exec(new String[]{"/bin/sh", "-c", "`" + shStr + "`"}, null, null);
-            InputStreamReader ir = new InputStreamReader(process.getInputStream());
-            BufferedReader errorReader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
-            LineNumberReader input = new LineNumberReader(ir);
-            String line;
-            process.waitFor();
-            while ((line = input.readLine()) != null) {
-                strList.add(line);
-            }
-
-            while (outputError && (line = errorReader.readLine()) != null) {
-                WinkLog.w(line);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        for (String str : strList) {
-            System.out.print(str);
-        }
-
-        return strList;
-    }
-
-    public static void executeScript(String cmd) throws IOException, InterruptedException {
-        Process p = Runtime.getRuntime().exec(new String[]{"/bin/sh", "-c", "`" + cmd + "`"}, null, null);
-        p.waitFor();
-
-        BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
-        BufferedReader errorReader = new BufferedReader(new InputStreamReader(p.getErrorStream()));
-
-        String line = "";
-        while ((line = reader.readLine()) != null) {
-            WinkLog.i(line);
-        }
-
-        while ((line = errorReader.readLine()) != null) {
-            WinkLog.i(line);
-        }
-    }
-
     public static class ShellResult {
         List<String> result = new ArrayList<>();
         List<String> errorResult = new ArrayList<>();
@@ -116,11 +65,31 @@ public class Utils {
         }
     }
 
-    public static ShellResult runShells(String... cmds) {
-        return runShells(true, cmds);
+    public enum ShellOutput {
+        NONE,
+        ALL,
+        ONLY_ERROR;
+
+        public void outputDebug(String msg) {
+            if (this == ALL) {
+                WinkLog.i(msg);
+            } else {
+                WinkLog.d(msg);
+            }
+        }
+
+        public void outputWarning(String msg) {
+            if (this != NONE) {
+                WinkLog.w(msg);
+            }
+        }
     }
 
-    public static ShellResult runShells(boolean reportLog, String... cmds) {
+    public static ShellResult runShells(String... cmds) {
+        return runShells(ShellOutput.ONLY_ERROR, cmds);
+    }
+
+    public static ShellResult runShells(ShellOutput output, String... cmds) {
         ShellResult result = new ShellResult();
 
         List<String> cmdArray = new ArrayList<>();
@@ -134,7 +103,8 @@ public class Utils {
                 sb.append('\n');
             }
             sb.append(cmd);
-            WinkLog.d("Execute shell: ", cmd);
+
+            output.outputDebug("Execute shell: " + cmd);
         }
         cmdArray.add(sb.toString());
 
@@ -149,17 +119,13 @@ public class Utils {
                 while ((line = reader.readLine()) != null) {
                     result.getResult().add(line);
 
-                    if (reportLog) {
-                        WinkLog.d("Shell result: ", line);
-                    }
+                    output.outputDebug("Shell result: " + line);
                 }
 
                 while ((line = errorReader.readLine()) != null) {
                     result.getErrorResult().add(line);
 
-                    if (reportLog) {
-                        WinkLog.w("Shell error: " + line);
-                    }
+                    output.outputDebug("Shell error: " + line);
                 }
             }
         } catch (Exception e) {

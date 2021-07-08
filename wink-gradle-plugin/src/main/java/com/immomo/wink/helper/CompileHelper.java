@@ -46,7 +46,7 @@ public class CompileHelper {
                 + sb.toString();
         WinkLog.d("[LiteBuild] : javac shellCommand = " + shellCommand);
         WinkLog.d("[LiteBuild] projectName : " + project.fixedInfo.name);
-        Utils.runShell(
+        Utils.runShells(
                 shellCommand
         );
 
@@ -161,7 +161,7 @@ public class CompileHelper {
 
         WinkLog.TimerLog log = WinkLog.timerStart("开始打DexPatch！");
 
-        Utils.runShell(cmds, false);
+        Utils.runShells(Utils.ShellOutput.NONE, cmds);
 
         log.end();
     }

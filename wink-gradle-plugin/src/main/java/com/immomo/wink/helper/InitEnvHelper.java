@@ -192,11 +192,6 @@ public class InitEnvHelper {
         return true;
     }
 
-    public void fullBuildByInstallDebug(String path) {
-        WinkLog.i("Cache or Branch invalid, start full build...");
-        Utils.runShells("cd " + path + " && " + "./gradlew installDebug");
-    }
-
     // from retrolambda
     public String getJavaHome() {
         String javaHomeProp = System.getProperty("java.home");

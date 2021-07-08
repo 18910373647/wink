@@ -56,7 +56,7 @@ class ResourceHelper {
         }
 
         Settings.data.needProcessDebugResources = true
-        val ret = Utils.runShells("cd ${Settings.env.appProjectDir}/../", "./gradlew process${Utils.upperCaseFirst(Settings.env.defaultFlavor)}DebugResources --offline")
+        val ret = Utils.runShells(Utils.ShellOutput.ALL, "cd ${Settings.env.appProjectDir}/../", "./gradlew process${Utils.upperCaseFirst(Settings.env.defaultFlavor)}DebugResources --offline")
         if (ret.errorResult.size > 0) {
 //            WinkLog.throwAssert("Compile resources error.");
         }
@@ -113,7 +113,7 @@ class ResourceHelper {
             rm -rf tempResFolder
         """.trimIndent()
 
-        Utils.executeScript(localScript)
+        Utils.runShells(localScript)
 
         WinkLog.d("Resource full build and package cost: " + (System.currentTimeMillis() - st))
     }
