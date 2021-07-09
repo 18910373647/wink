@@ -6,18 +6,18 @@ Wink是AndroidStudio的一个快速构建插件。Wink的目标是建立一个�
 
 
 ## Wink Insight 
-在Android开发过程中，应用程序的构建速度直接影响到开发者一天的工作效率。对于已经维护了几年的大型安卓项目来说，一行代码的改变有可能需要10分钟以上的时间来编译。虽然Instant Run可以带来一些优化，但优化结果仍然是分钟级的，Wink就是为了解决这个问题而产生的，对于简单的代码修改，编译速度提高到第二级。基于Gradle和Groovy，我们对java、kotlin和资源文件的编译过程进行了优化，并将整个过程交给Gradle的Task系统，不使用其他脚本语言，这不仅保证了项目代码的可读性和易用性，也大大提高了代码的可维护性。
+在Android开发过程中，应用程序的构建速度直接影响到开发者一天的工作效率。对于已经维护了几年的大型安卓项目来说，一行代码的改变有可能需要10分钟以上的时间来编译。虽然Instant Run可以带来一些优化，但优化结果仍然是分钟级的，Wink就是为了解决这个问题而产生的，对于简单的代码修改，编译速度提高到秒级。基于Gradle和Groovy，我们对java、kotlin和资源文件的编译过程进行了优化，并将整个过程交给Gradle的Task系统，不使用其他脚本语言，这不仅保证了项目代码的可读性和易用性，也大大提高了代码的可维护性。
 
 ## 特点 
 1. 支持Java变更
-2. kotlin变更支持
+2. 支持kotlin变更
 3. Gradle mutil模块支持
-4. 支持Res/values变更
+4. 支持资源变更
 
 
 ## 安装 
 ### 通过AndroidStuido插件安装
-1. 从[Wink.zip]下载插件(https://s.momocdn.com/s1/u/dcehhhadi/Wink-0.0.2.zip)
+1. 从[wink_studio_plugin.zip]下载插件(https://s.momocdn.com/s1/u/geajgghjh/Wink-2.1.2.zip)
 2. 打开AndroidStudio 
 3. 将Wink.zip拖到AndroidStudio 
 4. 重新启动AndroidStudio
