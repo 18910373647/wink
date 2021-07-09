@@ -10,5 +10,5 @@
 */build
 /capturesdo.sh
 cdn_upload.sh
-externalLib
 UploadProperties.gradle
+wink-patch-lib/build.gradle
