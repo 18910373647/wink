@@ -13,3 +13,4 @@ cdn_upload.sh
 UploadProperties.gradle
 do.sh
 wink-patch-lib/build.gradle
+wink-gradle-plugin/build.gradle
