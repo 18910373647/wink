@@ -10,10 +10,3 @@
 */build
 /capturesdo.sh
 wink-publish
-build.gradle
-buildSrc/build.gradle
-buildSrc/gradle.properties
-buildSrc/publish_to_maven_central.gradle
-gradle.properties
-wink-gradle-plugin/gradle.properties
-wink-patch-lib/publish_to_maven_central.gradle
