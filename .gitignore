@@ -11,3 +11,4 @@
 /capturesdo.sh
 wink-publish
 build.gradle
+buildSrc/build.gradle
